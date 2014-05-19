@@ -1,16 +1,79 @@
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
 #include "fork-parent.h"
+#include "sensorlib.h"
+
+#define SCAN_INTERVAL 	(10)
+
+static volatile sig_atomic_t doScan = 1;
+
+void signalHandler(int signalNumber)
+{
+	switch(signalNumber) {
+		case SIGTERM:
+		case SIGINT:
+			doScan = 0;
+			break;
+
+		default:
+			return; 
+	}
+}
+
+/* c-function prototypes */
+static int daemonize(void);
 
 int main(int argc, char *argv[])
 {
-	printf("The name of this program is '%s'.\n", argv[0]);
+	struct sigaction sa;
+
+    printf("The name of this program is '%s'.\n", argv[0]);
 	printf("The parent process ID is %d.\n", (int)getpid());
 
-	/* daemonize the process... */
+	/* initialize the signal handler */
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = &signalHandler;
+	sigaction(SIGTERM, &sa, NULL);
+	sigaction(SIGINT, &sa, NULL);
+
+	/* run process by default in the foreground */
+    /* \todo add -d daemon option */
+	if (argc != 1) {
+		if (daemonize() < 0) {
+			printf("Could not daemonize...\n");
+			return -1;
+		}
+	}
+
+	if (sensorlib_load() < 0) {
+		fprintf(stderr, "Could not initialize sensor library.\n");
+		return -1;
+	}
+
+    /* main process loop ... */
+    while (doScan) {
+		/* print status message to katcp log here */
+		printf("start scan...");
+		printf("done.\n");
+		sleep(SCAN_INTERVAL);
+	}
+
+	/* clean-up */
+	printf("Performing clean-up...\n");	
+	sensorlib_unload();
+
+	/* should not end up here.... */
+	return 0;
+}
+
+/* deamonize the process by detaching itself from the parent */
+int daemonize(void)
+{
 	if (fork_parent() < 0) {
-        fprintf(stderr, "unable to launch child process\n");
+        fprintf(stderr, "Unable to launch child process.\n");
 		return -1;
 	}
 
@@ -28,13 +91,5 @@ int main(int argc, char *argv[])
 	fflush(stderr);
 	close(STDERR_FILENO);
 
-    /* main process loop ... */
-    while(1) {
-		/* print status message to katcp log here */
-		sleep(10);
-	}	
-
-	/* should not end up here.... */
 	return 0;
 }
-
