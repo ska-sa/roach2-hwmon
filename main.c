@@ -7,7 +7,7 @@
 #include "fork-parent.h"
 #include "sensorlib.h"
 
-#define SCAN_INTERVAL 	(5)
+#define SCAN_INTERVAL 	(15)
 
 static volatile sig_atomic_t doScan = 1;
 
