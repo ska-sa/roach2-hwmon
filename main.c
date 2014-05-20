@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
 #include "fork-parent.h"
 #include "sensorlib.h"
 
-#define SCAN_INTERVAL 	(10)
+#define SCAN_INTERVAL 	(5)
 
 static volatile sig_atomic_t doScan = 1;
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
 {
 	struct sigaction sa;
 
-    printf("The name of this program is '%s'.\n", argv[0]);
+	printf("The name of this program is '%s'.\n", argv[0]);
 	printf("The parent process ID is %d.\n", (int)getpid());
 
 	/* initialize the signal handler */
@@ -40,21 +41,21 @@ int main(int argc, char *argv[])
 	sigaction(SIGINT, &sa, NULL);
 
 	/* run process by default in the foreground */
-    /* \todo add -d daemon option */
+	/* \todo add -d daemon option */
 	if (argc != 1) {
 		if (daemonize() < 0) {
 			printf("Could not daemonize...\n");
-			return -1;
+			return EXIT_FAILURE;
 		}
 	}
 
 	if (sensorlib_load() < 0) {
 		fprintf(stderr, "Could not initialize sensor library.\n");
-		return -1;
+		return EXIT_FAILURE;
 	}
 
-    /* main process loop ... */
-    while (doScan) {
+	/* main process loop ... */
+	while (doScan) {
 		/* print status message to katcp log here */
 		printf("start scan...");
 		printf("done.\n");
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
 	sensorlib_unload();
 
 	/* should not end up here.... */
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 /* deamonize the process by detaching itself from the parent */
@@ -77,8 +78,8 @@ int daemonize(void)
 		return -1;
 	}
 
-	/* print init strings via parent stderr pipe */
-    fprintf(stderr, "Initializing daemon...\n");
+	/* print initialization strings via parent stderr pipe */
+	fprintf(stderr, "Initializing daemon...\n");
 	fprintf(stderr, "The daemon process id is %d.\n", (int)getpid());
 
 	/* change daemon working directory to root */
@@ -87,7 +88,7 @@ int daemonize(void)
 		return -1;
 	}
 	
-	/* close the pipe which wil close the parent... */
+	/* close the pipe which will close the parent... */
 	fflush(stderr);
 	close(STDERR_FILENO);
 

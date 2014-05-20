@@ -1,6 +1,7 @@
+#include <stdlib.h>
 #include "sensorlib.h"
 
-#define SENSOR_CONF_PATH	NULL
+#define SENSOR_CONF_PATH		(NULL)
 
 int sensorlib_load(void)
 {

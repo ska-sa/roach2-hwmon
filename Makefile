@@ -13,7 +13,7 @@ INC = -I$(SENSORLIB)
 LIB = -L$(SENSORLIB)/lib -lsensors
 
 CC = $(CROSS_COMPILE)gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -ggdb -O0
 EXE = r2hwmond
 
 all: $(EXE)
