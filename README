@@ -1,0 +1,7 @@
+Roach 2 hardware monitoring
+
+
+Dependency:
+lm-sensors http://lm-sensors.org/
+
+
