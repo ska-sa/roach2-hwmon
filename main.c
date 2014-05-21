@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 		/* print status message to katcp log here */
 		printf("start scan...");
 		printf("done.\n");
+		fflush(stdout);
 		sleep(SCAN_INTERVAL);
 	}
 
