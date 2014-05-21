@@ -7,6 +7,7 @@
 #include "fork-parent.h"
 #include "sensorlib.h"
 #include "sensord.h"
+#include "log.h"
 
 #define SCAN_INTERVAL 	(5)
 
@@ -31,6 +32,7 @@ static int daemonize(void);
 int main(int argc, char *argv[])
 {
 	struct sigaction sa;
+	unsigned int counter = 0;
 
 	printf("The name of this program is '%s'.\n", argv[0]);
 	printf("The parent process ID is %d.\n", (int)getpid());
@@ -55,6 +57,8 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	log_init();
+
 	initKnownChips();
 
 	/* main process loop ... */
@@ -63,12 +67,15 @@ int main(int argc, char *argv[])
 		printf("start scan...");
 		printf("done.\n");
 		sleep(SCAN_INTERVAL);
+		//log_write(KATCP_LEVEL_INFO, "Scan done %n.\n", counter);
+		//counter++;
 	}
 
 	/* clean-up */
 	printf("Performing clean-up...\n");
 	freeKnownChips();
 	sensorlib_unload();
+	log_cleanup();
 
 	/* should not end up here.... */
 	return EXIT_SUCCESS;
