@@ -6,8 +6,9 @@
 #include <signal.h>
 #include "fork-parent.h"
 #include "sensorlib.h"
+#include "sensord.h"
 
-#define SCAN_INTERVAL 	(15)
+#define SCAN_INTERVAL 	(5)
 
 static volatile sig_atomic_t doScan = 1;
 
@@ -54,6 +55,8 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	initKnownChips();
+
 	/* main process loop ... */
 	while (doScan) {
 		/* print status message to katcp log here */
@@ -63,7 +66,8 @@ int main(int argc, char *argv[])
 	}
 
 	/* clean-up */
-	printf("Performing clean-up...\n");	
+	printf("Performing clean-up...\n");
+	freeKnownChips();
 	sensorlib_unload();
 
 	/* should not end up here.... */

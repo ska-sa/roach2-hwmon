@@ -385,6 +385,8 @@ int initKnownChips(void)
 	while ((name = sensors_get_detected_chips(NULL, &nr)))
 		count++;
 
+	printf("Found %d chips.\n", nr);
+
 	/* Allocate the memory we need */
 	knownChips = calloc(count, sizeof(ChipDescriptor));
 	if (!knownChips)
