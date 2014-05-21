@@ -3,6 +3,7 @@
 
 #define SENSOR_CONF_PATH		(NULL)
 
+
 int sensorlib_load(void)
 {
 	int ret = -1;

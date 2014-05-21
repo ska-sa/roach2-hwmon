@@ -13,7 +13,7 @@ static volatile sig_atomic_t doScan = 1;
 
 void signalHandler(int signalNumber)
 {
-	switch(signalNumber) {
+	switch (signalNumber) {
 		case SIGTERM:
 		case SIGINT:
 			doScan = 0;
@@ -70,12 +70,12 @@ int main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 }
 
-/* deamonize the process by detaching itself from the parent */
+/* daemonize the process by detaching itself from the parent */
 int daemonize(void)
 {
 	if (fork_parent() < 0) {
         fprintf(stderr, "Unable to launch child process.\n");
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	/* print initialization strings via parent stderr pipe */
@@ -85,7 +85,7 @@ int daemonize(void)
 	/* change daemon working directory to root */
 	if (chdir("/") < 0) {
 		fprintf(stderr, "Could not change working directory to root.\n");
-		return -1;
+		return EXIT_FAILURE;
 	}
 	
 	/* close the pipe which will close the parent... */
