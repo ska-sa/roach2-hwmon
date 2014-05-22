@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "sensord.h"
+#include "chips.h"
 #include "log.h"
 
 /* TODO: Temp in C/F */
@@ -33,6 +34,8 @@
 /** formatters **/
 
 static char buff[4096];
+
+struct ChipLib chipLib = {0};
 
 static const char *fmtExtra(int alrm, int beep)
 {
@@ -406,6 +409,11 @@ int initKnownChips(void)
 	return 0;
 }
 
+int chips_numChipNames(void)
+{
+	return chipLib.numChipNames;
+}
+
 void freeKnownChips(void)
 {
 	int index0;
@@ -414,3 +422,15 @@ void freeKnownChips(void)
 		free(knownChips[index0].features);
 	free(knownChips);
 }
+
+void chips_parse(void)
+{
+	chipLib.chipNames[0].prefix = SENSORS_CHIP_NAME_PREFIX_ANY;
+	chipLib.chipNames[0].bus.type = SENSORS_BUS_TYPE_ANY;
+	chipLib.chipNames[0].bus.nr = SENSORS_BUS_NR_ANY;
+	chipLib.chipNames[0].addr = SENSORS_CHIP_NAME_ADDR_ANY;
+	chipLib.numChipNames = 1;
+}
+
+
+

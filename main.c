@@ -8,6 +8,7 @@
 #include "sensorlib.h"
 #include "sensord.h"
 #include "log.h"
+#include "sense.h"
 
 #define SCAN_INTERVAL 	(2)
 
@@ -43,6 +44,8 @@ int main(int argc, char *argv[])
 	sigaction(SIGTERM, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
 
+	chips_parse();
+
 	/* run process by default in the foreground */
 	/* \todo add -d daemon option */
 	if (argc != 1) {
@@ -58,29 +61,32 @@ int main(int argc, char *argv[])
 	}
 
 	if (log_init() < 0) {
-		fprintf(stderr, "Could not initialize katcl log logic.\n");
+		fprintf(stderr, "Could not initialize katcl message logic.\n");
 	}
 
 	initKnownChips();
 
 	/* main process loop ... */
 	while (doScan) {
-		/* print status message to katcp log here */
 		printf("start scan...");
 		printf("done.\n");
 		fflush(stdout);
-		sleep(SCAN_INTERVAL);
+
+		sense_readChips();
+		sense_scanChips();
+
 		log_message(KATCP_LEVEL_INFO, "Scan done %d.\n", counter);
 		counter++;
+		sleep(SCAN_INTERVAL);
 	}
 
 	/* clean-up */
 	printf("Performing clean-up...\n");
+	log_message(KATCP_LEVEL_INFO, "Shutting down...\n");
 	freeKnownChips();
 	sensorlib_unload();
 	log_cleanup();
 
-	/* should not end up here.... */
 	return EXIT_SUCCESS;
 }
 

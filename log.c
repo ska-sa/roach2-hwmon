@@ -47,9 +47,11 @@ int log_message(int loglevel, char *fmt, ...)
 	return ret;
 }
 
-
 void log_cleanup(void)
 {
-	destroy_katcl(k, 0);
+	if (k != NULL) {
+		destroy_katcl(k, 0);
+		k = NULL;
+	}
 }
 
