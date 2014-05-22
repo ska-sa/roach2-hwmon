@@ -9,7 +9,7 @@
 #include "sensord.h"
 #include "log.h"
 
-#define SCAN_INTERVAL 	(5)
+#define SCAN_INTERVAL 	(2)
 
 static volatile sig_atomic_t doScan = 1;
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	unsigned int counter = 0;
 
 	printf("The name of this program is '%s'.\n", argv[0]);
-	printf("The parent process ID is %d.\n", (int)getpid());
+	printf("The process ID is %d.\n", (int)getpid());
 
 	/* initialize the signal handler */
 	memset(&sa, 0, sizeof(sa));
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
 		printf("done.\n");
 		fflush(stdout);
 		sleep(SCAN_INTERVAL);
-		//log_write(KATCP_LEVEL_INFO, "Scan done %n.\n", counter);
-		//counter++;
+		log_message(KATCP_LEVEL_INFO, "Scan done %d.\n", counter);
+		counter++;
 	}
 
 	/* clean-up */

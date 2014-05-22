@@ -13,7 +13,7 @@
 
 int log_init(void);
 
-int log_write(int loglevel, char *fmt, ...);
+int log_message(int loglevel, char *fmt, ...);
 
 void log_cleanup(void);
 

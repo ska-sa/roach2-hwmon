@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>katcp</name>
+			<type>2</type>
+			<location>/home/rijandn/development/katcp_devel/katcp</location>
+		</link>
+		<link>
 			<name>lib</name>
 			<type>2</type>
 			<location>/home/rijandn/development/lm-sensors/lib</location>

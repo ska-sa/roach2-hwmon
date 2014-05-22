@@ -9,7 +9,8 @@
 #include <unistd.h>
 #include "log.h"
 
-static struct katcl_line *k;
+static struct katcl_line *k = NULL;
+static char *app = "roach2hwmon";
 
 int log_init(void)
 {
@@ -23,17 +24,22 @@ int log_init(void)
 	return 0;
 }
 
-int log_write(int loglevel, char *fmt, ...)
+int log_message(int loglevel, char *fmt, ...)
 {
 	va_list args;
-	int ret = 0;
+	int ret = -1;
+
+	if (k == NULL) {
+		return -1;
+	}
 
 	va_start(args, fmt);
-	ret = vlog_message_katcl(k, loglevel, "r2hwmon", fmt, args);
+	ret = vlog_message_katcl(k, loglevel, app, fmt, args);
 	va_end(args);
 
 	return ret;
 }
+
 
 void log_cleanup(void)
 {
