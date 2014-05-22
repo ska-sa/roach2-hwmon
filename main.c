@@ -57,7 +57,9 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	log_init();
+	if (log_init() < 0) {
+		fprintf(stderr, "Could not initialize katcl log logic.\n");
+	}
 
 	initKnownChips();
 

@@ -37,6 +37,13 @@ int log_message(int loglevel, char *fmt, ...)
 	ret = vlog_message_katcl(k, loglevel, app, fmt, args);
 	va_end(args);
 
+	/* write the log data out */
+	while ((ret = write_katcl(k)) == 0);
+
+	if (ret < 0) {
+		return -1;
+	}
+
 	return ret;
 }
 

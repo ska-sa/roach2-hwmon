@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "sensord.h"
+#include "log.h"
 
 /* TODO: Temp in C/F */
 
@@ -386,6 +387,7 @@ int initKnownChips(void)
 		count++;
 
 	printf("Found %d chips.\n", nr);
+	log_message(KATCP_LEVEL_INFO, "Found %d sensor chips.\n", nr);
 
 	/* Allocate the memory we need */
 	knownChips = calloc(count, sizeof(ChipDescriptor));
