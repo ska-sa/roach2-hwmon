@@ -18,7 +18,7 @@ EXE = r2hwmond
 
 all: $(EXE)
 
-r2hwmond: main.c fork-parent.c sensorlib.c chips.c log.c sense.c
+r2hwmond: main.c fork-parent.c sensorlib.c chips.c log.c sense.c alarm.c
 	$(CC) $(CFLAGS) -o $@ $(INC) $^ $(LIB)
 #	$(CC) -DBUILD=\"$(BUILD)\" $(CFLAGS) $(INC) -o $@ $^ $(LIB)
 

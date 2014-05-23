@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "sensord.h"
 #include "sense.h"
+#include "alarm.h"
 
 #define DO_READ 0
 #define DO_SCAN 1
@@ -121,11 +122,13 @@ static int do_features(const sensors_chip_name *chip,
 		return -1;
 	}
 
-	if (action == DO_READ)
+	if (action == DO_READ) {
 		log_message(KATCP_LEVEL_INFO, "  %s: %s", label, formatted);
-	else
+	} else {
 		log_message(KATCP_LEVEL_WARN, "Sensor alarm: Chip %s: %s: %s",
 			  chipName(chip), label, formatted);
+		alarm_handler(chipName(chip), label);
+	}
 
 	free(label);
 
