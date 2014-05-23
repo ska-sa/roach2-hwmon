@@ -10,6 +10,7 @@ CC = $(CROSS_COMPILE)gcc
 CFLAGS = -Wall -ggdb -O0
 EXE = r2hwmond
 SOURCE = main.c fork-parent.c sensorlib.c chips.c log.c sense.c alarm.c
+ECHO = echo
 
 SERVER = dbelab00
 
