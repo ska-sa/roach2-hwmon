@@ -13,8 +13,16 @@
 #include "chips.h"
 #include "log.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int sense_readChips(void);
 
 int sense_scanChips(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SENSE_H_ */
