@@ -9,8 +9,9 @@ LIB = -L$(SENSORLIB)lib -L$(KATCPLIB) -lsensors -lkatcp
 CC = $(CROSS_COMPILE)gcc
 CFLAGS = -Wall -ggdb -O0
 EXE = r2hwmond
-
 SOURCE = main.c fork-parent.c sensorlib.c chips.c log.c sense.c alarm.c
+
+SERVER = dbelab00
 
 all: $(EXE)
 
@@ -24,6 +25,6 @@ static:
 	$(CC) $(CFLAGS) -o $(EXE) $(INC) $(SOURCE) -static $(LIB) -lm
 
 install: $(EXE)
-	$(ECHO) "Attempt to copy to server..."
-	scp $^ $(USER)@$(SERVER):/home/nfs/test/.
+	$(ECHO) "Attempting to copy $(EXE) to server..."
+	scp $(EXE) $(USER)@$(SERVER):/home/nfs/test/.
 
