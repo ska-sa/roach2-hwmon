@@ -8,9 +8,9 @@ triggered.
 
 Dependencies
 1. lm-sensors 
-	http://lm-sensors.org/
+    http://lm-sensors.org/
 2. katcp library
-	https://casper.berkeley.edu/wiki/KATCP
- 	https://github.com/ska-sa/katcp_devel
+    https://casper.berkeley.edu/wiki/KATCP
+    https://github.com/ska-sa/katcp_devel
 
 
