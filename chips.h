@@ -11,8 +11,8 @@
 #define CHIPS_MAX 16
 
 struct ChipLib {
-	int numChipNames;
-	sensors_chip_name chipNames[CHIPS_MAX];
+    int numChipNames;
+    sensors_chip_name chipNames[CHIPS_MAX];
 };
 
 void chips_parse(void);

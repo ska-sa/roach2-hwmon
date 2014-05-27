@@ -23,7 +23,7 @@
 
 #include "lib/sensors.h"
 
-#define ARRAY_SIZE(arr)	(int)(sizeof(arr) / sizeof((arr)[0]))
+#define ARRAY_SIZE(arr)    (int)(sizeof(arr) / sizeof((arr)[0]))
 
 extern void sensorLog(int priority, const char *fmt, ...);
 
@@ -58,30 +58,30 @@ extern int rrdCGI(void);
 #define MAX_DATA 5
 
 typedef const char *(*FormatterFN) (const double values[], int alrm,
-				     int beep);
+                     int beep);
 
 typedef const char *(*RRDFN) (const double values[]);
 
 typedef enum {
-	DataType_voltage = 0,
-	DataType_rpm,
-	DataType_temperature,
-	DataType_other = -1
+    DataType_voltage = 0,
+    DataType_rpm,
+    DataType_temperature,
+    DataType_other = -1
 } DataType;
 
 typedef struct {
-	FormatterFN format;
-	RRDFN rrd;
-	DataType type;
-	int alarmNumber;
-	int beepNumber;
-	const sensors_feature *feature;
-	int dataNumbers[MAX_DATA + 1];
+    FormatterFN format;
+    RRDFN rrd;
+    DataType type;
+    int alarmNumber;
+    int beepNumber;
+    const sensors_feature *feature;
+    int dataNumbers[MAX_DATA + 1];
 } FeatureDescriptor;
 
 typedef struct {
-	const sensors_chip_name *name;
-	FeatureDescriptor *features;
+    const sensors_chip_name *name;
+    FeatureDescriptor *features;
 } ChipDescriptor;
 
 extern ChipDescriptor * knownChips;

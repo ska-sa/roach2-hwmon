@@ -42,7 +42,7 @@ int fork_parent()
     close(p[0]);
     if (p[1] != STDERR_FILENO) {
       if (dup2(p[1], STDERR_FILENO) != STDERR_FILENO) {
-	exit(EX_OSERR);
+    exit(EX_OSERR);
       }
       close(p[1]);
     }
@@ -87,7 +87,7 @@ int fork_parent()
   sched_yield();
   result = 0;
 
-  if (waitpid(pid, &status, WNOHANG) > 0) {	/* got a child */
+  if (waitpid(pid, &status, WNOHANG) > 0) {    /* got a child */
     if (WIFEXITED(status)) {
       result = WEXITSTATUS(status);
       fprintf(stderr, "exited with code %d\n", result);
@@ -101,7 +101,7 @@ int fork_parent()
       raise(result);
 #endif
 #if 0
-    } else if (WIFSTOPPED(status)) {	/* too clever by half */
+    } else if (WIFSTOPPED(status)) {    /* too clever by half */
       result = WSTOPSIG(status);
       fprintf(stderr, "stopped by signal %d, restarting with %d\n", result, SIGCONT);
       kill(pid, SIGCONT);

@@ -14,44 +14,44 @@ static char *app = "roach2hwmon";
 
 int log_init(void)
 {
-	k = create_katcl(STDOUT_FILENO);
+    k = create_katcl(STDOUT_FILENO);
 
-	if (k == NULL) {
-		fprintf(stderr, "unable to create katcl message logic.");
-		return -1;
-	}
+    if (k == NULL) {
+        fprintf(stderr, "unable to create katcl message logic.");
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 int log_message(int loglevel, char *fmt, ...)
 {
-	va_list args;
-	int ret = -1;
+    va_list args;
+    int ret = -1;
 
-	if (k == NULL) {
-		return -1;
-	}
+    if (k == NULL) {
+        return -1;
+    }
 
-	va_start(args, fmt);
-	ret = vlog_message_katcl(k, loglevel, app, fmt, args);
-	va_end(args);
+    va_start(args, fmt);
+    ret = vlog_message_katcl(k, loglevel, app, fmt, args);
+    va_end(args);
 
-	/* write the log data out */
-	while ((ret = write_katcl(k)) == 0);
+    /* write the log data out */
+    while ((ret = write_katcl(k)) == 0);
 
-	if (ret < 0) {
-		return -1;
-	}
+    if (ret < 0) {
+        return -1;
+    }
 
-	return ret;
+    return ret;
 }
 
 void log_cleanup(void)
 {
-	if (k != NULL) {
-		destroy_katcl(k, 0);
-		k = NULL;
-	}
+    if (k != NULL) {
+        destroy_katcl(k, 0);
+        k = NULL;
+    }
 }
 
