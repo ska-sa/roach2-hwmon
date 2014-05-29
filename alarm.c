@@ -15,8 +15,7 @@
 static int send_katcp_command(const char *command)
 {
     struct katcl_line *l = NULL;
-    int  result, total, i;
-    char *ptr = NULL;
+    int  retVal;
 
     /* connect to a remote machine, arg is "server:port" where ":port is optional" */
     l = create_name_rpc_katcl("localhost:7147");
@@ -26,44 +25,43 @@ static int send_katcp_command(const char *command)
     }
 
     /* send the request, with 5000ms timeout. Here we don't pass any parameters */
-    result = send_rpc_katcl(l, 5000, KATCP_FLAG_FIRST | KATCP_FLAG_LAST | KATCP_FLAG_STRING, command, NULL);
+    retVal = send_rpc_katcl(l, 5000, KATCP_FLAG_FIRST | KATCP_FLAG_LAST | KATCP_FLAG_STRING, command, NULL);
 
     /* result is 0 if the reply returns "ok", 1 if it failed and -1 if things went wrong doing IO or otherwise */
 #if 0
-    printf("result of request is %d\n", result);
-#endif
+    int i = 0;
+    char *ptr = NULL;
+    printf("result of request is %d\n", retVal);
 
     /* you can examine the content of the reply with the following functions */
-    total = arg_count_katcl(l);
-#if 0
+    int total = arg_count_katcl(l);
     printf("have %d arguments in reply\n", total);
-#endif
+
     for (i = 0; i < total; i++) {
         /* for binary data use the arg_buffer_katcl, string will stop at the first occurrence of a \0 */
         ptr = arg_string_katcl(l, i);
-#if 0
         printf("reply[%d] is <%s>\n", i, ptr);
-#endif
     }
 
     fflush(stdout);
+#endif
 
     destroy_rpc_katcl(l);
 
-    return 0;
+    return retVal;
 }
 
 int alarm_handler(const char *chipName, const char *label)
 {
+    int retVal = 0;
 
-
-    /* fpga temp alarm triggered */
+	/* fpga temp alarm triggered */
     if (!(strcmp(chipName, "max1668-i2c-0-18") && strcmp(label, "temp3"))) {
         log_message(KATCP_LEVEL_WARN, "fpga alarm triggered...unloading fpga");
-        send_katcp_command("?progdev");
+        retVal = send_katcp_command("?progdev");
     }
 
-    return 0;
+    return retVal;
 }
 
 
