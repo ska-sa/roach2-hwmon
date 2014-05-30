@@ -12,8 +12,11 @@
 #define DO_READ 0
 #define DO_SCAN 1
 #define DO_SET  2
+#define DO_REGISTER 3
 
 extern struct ChipLib chipLib;
+
+static int firstRead = 1;
 
 static const char *chipName(const sensors_chip_name *chip)
 {
@@ -37,7 +40,7 @@ static int idChip(const sensors_chip_name *chip)
 
     adapter = sensors_get_adapter_name(&chip->bus);
     if (!adapter)
-        log_message(KATCP_LEVEL_INFO, "Error getting adapter name");
+        log_message(KATCP_LEVEL_ERROR, "Error getting adapter name");
     else
         log_message(KATCP_LEVEL_INFO, "Adapter: %s", adapter);
 
@@ -89,19 +92,7 @@ static int do_features(const sensors_chip_name *chip,
         }
     }
 
-    /* For RRD, we don't need anything else */
-//    if (action == DO_RRD) {
-//        if (feature->rrd) {
-//            const char *rrded = feature->rrd(val);
-//
-//            sprintf(rrdBuff + strlen(rrdBuff), ":%s",
-//                rrded ? rrded : "U");
-//        }
-//
-//        return 0;
-//    }
-
-    /* For scanning and logging, we need extra information */
+    /* For scanning and reading, we need extra information */
     beep = get_flag(chip, feature->beepNumber);
     if (beep == -1)
         return -1;
@@ -123,8 +114,20 @@ static int do_features(const sensors_chip_name *chip,
     }
 
     if (action == DO_READ) {
-        log_message(KATCP_LEVEL_INFO, "  %s: %s", label, formatted);
+    	if (!firstRead) {
+    		/* update katcp sensor-status */
+    		if (!log_update_sensor(label, KATCP_LEVEL_INFO, val[0])) {
+    			log_message(KATCP_LEVEL_ERROR, "Error updating sensor status: %s",
+    		              label);
+    		}
+    		log_message(KATCP_LEVEL_INFO, "  %s: %s", label, formatted);
+    	} else {
+    		/* update katcp sensor-list */
+    		log_addsensor(label, val[1], val[2]);
+    	}
     } else {
+    	/* alarm condition occured */
+    	log_update_sensor(label, KATCP_LEVEL_WARN, val[0]);
         log_message(KATCP_LEVEL_WARN, "Sensor alarm: Chip %s: %s: %s",
               chipName(chip), label, formatted);
         alarm_handler(chipName(chip), label);
@@ -215,6 +218,10 @@ int sense_readChips(void)
     log_message(KATCP_LEVEL_DEBUG, "sensor read started");
     ret = doChips(DO_READ);
     log_message(KATCP_LEVEL_DEBUG, "sensor read finished");
+
+    if (firstRead) {
+    	firstRead = 0;
+    }
 
     return ret;
 }

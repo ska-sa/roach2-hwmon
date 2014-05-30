@@ -111,30 +111,6 @@ static const char *fmtSoundAlarm(const double values[], int alrm, int beep)
     return fmtExtra(alrm, beep);
 }
 
-static const char *rrdF0(const double values[])
-{
-    sprintf(buff, "%.0f", values[0]);
-    return buff;
-}
-
-static const char *rrdF1(const double values[])
-{
-    sprintf(buff, "%.1f", values[0]);
-    return buff;
-}
-
-static const char *rrdF2(const double values[])
-{
-    sprintf(buff, "%.2f", values[0]);
-    return buff;
-}
-
-static const char *rrdF3(const double values[])
-{
-    sprintf(buff, "%.3f", values[0]);
-    return buff;
-}
-
 static void fillChipVoltage(FeatureDescriptor *voltage,
                 const sensors_chip_name *name,
                 const sensors_feature *feature)
@@ -142,7 +118,6 @@ static void fillChipVoltage(FeatureDescriptor *voltage,
     const sensors_subfeature *sf, *sfmin, *sfmax;
     int pos = 0;
 
-    voltage->rrd = rrdF2;
     voltage->type = DataType_voltage;
 
     sf = sensors_get_subfeature(name, feature,
@@ -192,7 +167,6 @@ static void fillChipTemperature(FeatureDescriptor *temperature,
     const sensors_subfeature *sf, *sfmin, *sfmax, *sfhyst;
     int pos = 0;
 
-    temperature->rrd = rrdF1;
     temperature->type = DataType_temperature;
 
     sf = sensors_get_subfeature(name, feature,
@@ -246,7 +220,6 @@ static void fillChipFan(FeatureDescriptor *fan,
     const sensors_subfeature *sf, *sfmin, *sfdiv;
     int pos = 0;
 
-    fan->rrd = rrdF0;
     fan->type = DataType_rpm;
 
     sf = sensors_get_subfeature(name, feature,
@@ -302,7 +275,6 @@ static void fillChipVid(FeatureDescriptor *vid,
         return;
 
     vid->format = fmtVolt_3;
-    vid->rrd = rrdF3;
     vid->type = DataType_voltage;
     vid->alarmNumber = -1;
     vid->beepNumber = -1;
@@ -322,7 +294,6 @@ static void fillChipBeepEnable(FeatureDescriptor *beepen,
         return;
 
     beepen->format = fmtSoundAlarm;
-    beepen->rrd = rrdF0;
     beepen->type = DataType_other;
     beepen->alarmNumber = -1;
     beepen->beepNumber = -1;

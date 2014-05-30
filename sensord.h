@@ -46,21 +46,12 @@ extern int scanChips(void);
 extern int setChips(void);
 extern int rrdChips(void);
 
-/* from rrd.c */
-
-extern char rrdBuff[];
-extern int rrdInit(void);
-extern int rrdUpdate(void);
-extern int rrdCGI(void);
-
 /* from chips.c */
 
 #define MAX_DATA 5
 
 typedef const char *(*FormatterFN) (const double values[], int alrm,
                      int beep);
-
-typedef const char *(*RRDFN) (const double values[]);
 
 typedef enum {
     DataType_voltage = 0,
@@ -71,7 +62,6 @@ typedef enum {
 
 typedef struct {
     FormatterFN format;
-    RRDFN rrd;
     DataType type;
     int alarmNumber;
     int beepNumber;

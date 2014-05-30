@@ -7,7 +7,7 @@ INC = -I$(SENSORLIB) -I$(KATCPLIB)
 LIB = -L$(SENSORLIB)lib -L$(KATCPLIB) -lsensors -lkatcp
 
 CC = $(CROSS_COMPILE)gcc
-CFLAGS = -Wall -ggdb -O0
+CFLAGS = -Wall -ggdb -O0 -DKATCP_USE_FLOATS
 EXE = r2hwmond
 SOURCE = main.c fork-parent.c sensorlib.c chips.c log.c sense.c alarm.c
 ECHO = echo

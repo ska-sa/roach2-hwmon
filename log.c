@@ -70,7 +70,7 @@ int log_sensorlist(void)
 	return ret;
 }
 
-int log_sensorstatus(void)
+int log_addsensor(char *name, double min, double max)
 {
 	int ret = 0;
 
@@ -79,12 +79,75 @@ int log_sensorstatus(void)
 	}
 
 	/* register sensor(s) */
+	ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-list");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, name);
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, "description");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, "millidegrees");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, "integer");
+
+	//ret += append_string_katcl(k, KATCP_FLAG_STRING, "0");
+	//ret += append_string_katcl(k, KATCP_FLAG_LAST | KATCP_FLAG_STRING, "80000");
+
+	/* multiply with a 1000 since our units are in milli's */
+	ret += append_signed_long_katcl(k, KATCP_FLAG_SLONG, (long)(min*1000));
+	ret += append_signed_long_katcl(k, KATCP_FLAG_LAST | KATCP_FLAG_SLONG, (long)(max*1000));
+
+    /* write the log data out */
+    while ((ret = write_katcl(k)) == 0);
+
+	return ret;
+}
+
+int log_sensorstatus(void)
+{
+	int ret = 0;
+
+	if (k == NULL) {
+		return -1;
+	}
+
+	/* update sensor status */
 	ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-status");
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "123456789");
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "1");
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "dummytemp");
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "nominal");
 	ret += append_string_katcl(k, KATCP_FLAG_LAST | KATCP_FLAG_STRING, "23000");
+
+    /* write the log data out */
+    while ((ret = write_katcl(k)) == 0);
+
+	return ret;
+}
+
+int log_update_sensor(char *name, int status, double val)
+{
+	int ret = 0;
+
+	if (k == NULL) {
+		return -1;
+	}
+
+	/* update sensor status */
+	ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-status");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, "123456789");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, "1");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, name);
+
+	if (status == KATCP_LEVEL_INFO) {
+		ret += append_string_katcl(k, KATCP_FLAG_STRING, "nominal");
+	} else if (status == KATCP_LEVEL_WARN){
+		ret += append_string_katcl(k, KATCP_FLAG_STRING, "warn");
+	} else if (status == KATCP_LEVEL_ERROR){
+		ret += append_string_katcl(k, KATCP_FLAG_STRING, "error");
+	} else if (status == KATCP_LEVEL_FATAL){
+		ret += append_string_katcl(k, KATCP_FLAG_STRING, "failure");
+	} else {
+		ret += append_string_katcl(k, KATCP_FLAG_STRING, "unknown");
+	}
+
+	/* multiply with a 1000 since our units are in milli's */
+	ret += append_signed_long_katcl(k, KATCP_FLAG_LAST | KATCP_FLAG_SLONG, (long)(val*1000));
 
     /* write the log data out */
     while ((ret = write_katcl(k)) == 0);

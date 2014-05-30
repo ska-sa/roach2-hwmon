@@ -21,7 +21,11 @@ int log_message(int loglevel, char *fmt, ...);
 
 int log_sensorlist(void);
 
+int log_addsensor(char *name, double min, double max);
+
 int log_sensorstatus(void);
+
+int log_update_sensor(char *name, int status, double val);
 
 void log_cleanup(void);
 
