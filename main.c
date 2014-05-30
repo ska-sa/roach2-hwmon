@@ -5,14 +5,13 @@
 #include <unistd.h>
 #include <signal.h>
 #include <limits.h>
+#include "r2hwmond.h"
 #include "fork-parent.h"
+#include "katcp_sensors.h"
 #include "sensorlib.h"
 #include "sensord.h"
 #include "log.h"
 #include "sense.h"
-
-#define SCAN_INTERVAL_S    (5)
-#define READ_INTERVAL_S   (15)
 
 static volatile sig_atomic_t doScan = 1;
 
@@ -68,6 +67,7 @@ int main(int argc, char *argv[])
     }
 
     initKnownChips();
+    katcp_sensors_register();
 
     /* main process loop ... */
     while (doScan) {
@@ -75,22 +75,22 @@ int main(int argc, char *argv[])
         printf("done.\n");
         fflush(stdout);
 
-        if (READ_INTERVAL_S && (readValue <= 0)) {
+        if (R2HWMOND_READ_INTERVAL_S && (readValue <= 0)) {
             sense_readChips();
-            readValue += READ_INTERVAL_S;
+            readValue += R2HWMOND_READ_INTERVAL_S;
         }
 
-        if (SCAN_INTERVAL_S && (scanValue <= 0)) {
+        if (R2HWMOND_SCAN_INTERVAL_S && (scanValue <= 0)) {
             sense_scanChips();
-            scanValue += SCAN_INTERVAL_S;
+            scanValue += R2HWMOND_SCAN_INTERVAL_S;
         }
 
         log_message(KATCP_LEVEL_INFO, "Scan done %d.\n", counter);
         counter++;
 
         /* calculate the sleeptime, since we have a read and scan interval */
-        int a = SCAN_INTERVAL_S ? scanValue : INT_MAX;
-        int b = READ_INTERVAL_S ? readValue : INT_MAX;
+        int a = R2HWMOND_SCAN_INTERVAL_S ? scanValue : INT_MAX;
+        int b = R2HWMOND_READ_INTERVAL_S ? readValue : INT_MAX;
         sleepTime = (a < b) ? a : b;
 
         sleep(sleepTime);

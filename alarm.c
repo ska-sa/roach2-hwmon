@@ -8,6 +8,7 @@
 #include <string.h>
 #include <errno.h>
 #include "alarm.h"
+#include "r2hwmond.h"
 #include "log.h"
 #include "katcl.h"
 #include "katcp.h"
@@ -18,7 +19,7 @@ static int send_katcp_command(const char *command)
     int  retVal;
 
     /* connect to a remote machine, arg is "server:port" where ":port is optional" */
-    l = create_name_rpc_katcl("localhost:7147");
+    l = create_name_rpc_katcl(R2HWMOND_SERVER);
     if (l == NULL) {
         fprintf(stderr, "Unable to create client connection to server: %s\n", strerror(errno));
         return 1;

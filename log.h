@@ -5,11 +5,11 @@
  *      Author: rijandn
  */
 
-#include "katcp.h"
-#include "katcl.h"
-
 #ifndef _ROACH_LOG_H_
 #define _ROACH_LOG_H_
+
+#include "katcp.h"
+#include "katcl.h"
 
 #ifdef __cplusplus
 extern "C" {
