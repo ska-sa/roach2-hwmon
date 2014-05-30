@@ -7,7 +7,6 @@
 #include <limits.h>
 #include "r2hwmond.h"
 #include "fork-parent.h"
-#include "katcp_sensors.h"
 #include "sensorlib.h"
 #include "sensord.h"
 #include "log.h"
@@ -67,7 +66,9 @@ int main(int argc, char *argv[])
     }
 
     initKnownChips();
-    katcp_sensors_register();
+
+
+    log_sensorlist();
 
     /* main process loop ... */
     while (doScan) {
@@ -77,6 +78,7 @@ int main(int argc, char *argv[])
 
         if (R2HWMOND_READ_INTERVAL_S && (readValue <= 0)) {
             sense_readChips();
+            log_sensorstatus();
             readValue += R2HWMOND_READ_INTERVAL_S;
         }
 

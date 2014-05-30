@@ -19,6 +19,10 @@ int log_init(void);
 
 int log_message(int loglevel, char *fmt, ...);
 
+int log_sensorlist(void);
+
+int log_sensorstatus(void);
+
 void log_cleanup(void);
 
 #ifdef __cplusplus
