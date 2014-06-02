@@ -53,7 +53,7 @@ static const struct chipLookup table[] = {
 static struct katcl_line *k = NULL;
 static char *app = "roach2hwmon";
 
-int getAttributes(const char *chip, char *name, char *sensor,
+static int getAttributes(const char *chip, char *name, char *sensor,
 							char *description, char *unit)
 {
 	int i = 0;
@@ -61,6 +61,7 @@ int getAttributes(const char *chip, char *name, char *sensor,
 	while (table[i].chip != NULL) {
 		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
 			sensor = table[i].sensor;
+			//strncpy(sensor, table[i].sensor, strlen());
 			description = table[i].desc;
 			unit = table[i].unit;
 			return 0;
@@ -73,6 +74,48 @@ int getAttributes(const char *chip, char *name, char *sensor,
 	unit = "unspecified";
 
 	return 1;
+}
+
+static char *getSensor(const char *chip, char *name)
+{
+	int i = 0;
+
+	while (table[i].chip != NULL) {
+		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
+			return table[i].sensor;
+		}
+		i++;
+	}
+
+	return "sensor";
+}
+
+static char *getDescription(const char *chip, char *name)
+{
+	int i = 0;
+
+	while (table[i].chip != NULL) {
+		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
+			return table[i].desc;
+		}
+		i++;
+	}
+
+	return "no description";
+}
+
+static char *getUnit(const char *chip, char *name)
+{
+	int i = 0;
+
+	while (table[i].chip != NULL) {
+		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
+			return table[i].unit;
+		}
+		i++;
+	}
+
+	return "unspecified";
 }
 
 int log_init(void)
@@ -136,22 +179,22 @@ int log_sensorlist(void)
 int log_addsensor(const char *chip, char *name, double min, double max)
 {
 	int ret = 0;
-	char namebuff[256];
-	char descbuff[256];
-	char unitbuff[256];
+	//char namebuff[256];
+	//char descbuff[256];
+	//char unitbuff[256];
 
 	if (k == NULL) {
 		return -1;
 	}
 
 	/* populate sensor attributes */
-	getAttributes(chip, name, namebuff, descbuff, unitbuff);
+	//getAttributes(chip, name, namebuff, descbuff, unitbuff);
 
 	/* register sensor(s) */
 	ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-list");
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, namebuff);
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, descbuff);
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, unitbuff);
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, getSensor(chip, name));
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, getDescription(chip, name));
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, getUnit(chip, name));
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "integer");
 
 	/* multiply with a 1000 since our units are in milli's */
