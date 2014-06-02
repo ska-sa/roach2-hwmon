@@ -56,13 +56,14 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (log_init() < 0) {
+        fprintf(stderr, "Could not initialize katcl message logic.\n");
+    }
+
+
     if (sensorlib_load() < 0) {
         fprintf(stderr, "Could not initialize sensor library.\n");
         return EXIT_FAILURE;
-    }
-
-    if (log_init() < 0) {
-        fprintf(stderr, "Could not initialize katcl message logic.\n");
     }
 
     initKnownChips();
