@@ -12,7 +12,6 @@
 #define DO_READ 0
 #define DO_SCAN 1
 #define DO_SET  2
-#define DO_REGISTER 3
 
 extern struct ChipLib chipLib;
 
@@ -120,7 +119,7 @@ static int do_features(const sensors_chip_name *chip,
     			log_message(KATCP_LEVEL_ERROR, "Error updating sensor status: %s",
     		              label);
     		}
-    		log_message(KATCP_LEVEL_INFO, "  %s: %s", label, formatted);
+    		//log_message(KATCP_LEVEL_INFO, "  %s: %s", label, formatted);
     	} else {
     		/* update katcp sensor-list */
     		log_addsensor(label, val[1], val[2]);

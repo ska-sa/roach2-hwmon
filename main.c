@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
 
     initKnownChips();
 
-
-    log_sensorlist();
+    /* katcp sensor list get initialised on first sense_readChips() */
+    sense_readChips();
 
     /* main process loop ... */
     while (doScan) {
@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
 
         if (R2HWMOND_READ_INTERVAL_S && (readValue <= 0)) {
             sense_readChips();
-            log_sensorstatus();
             readValue += R2HWMOND_READ_INTERVAL_S;
         }
 
