@@ -85,6 +85,13 @@ static const char *fmtVolts_2(const double values[], int alrm, int beep)
     return fmtExtra(alrm, beep);
 }
 
+static const char *fmtCurrents_2(const double values[], int alrm, int beep)
+{
+    sprintf(buff, "%+.2f A (min = %+.2f A, max = %+.2f A)", values[0],
+        values[1], values[2]);
+    return fmtExtra(alrm, beep);
+}
+
 static const char *fmtFans_0(const double values[], int alrm, int beep)
 {
     sprintf(buff, "%.0f RPM (min = %.0f RPM, div = %.0f)", values[0],
@@ -157,6 +164,55 @@ static void fillChipVoltage(FeatureDescriptor *voltage,
         voltage->beepNumber = sf->number;
     } else {
         voltage->beepNumber = -1;
+    }
+}
+
+static void fillChipCurrent(FeatureDescriptor *current,
+				const sensors_chip_name *name,
+				const sensors_feature *feature)
+{
+    const sensors_subfeature *sf, *sfmin, *sfmax;
+    int pos = 0;
+
+    current->type = DataType_current;
+
+    sf = sensors_get_subfeature(name, feature,
+                    SENSORS_SUBFEATURE_CURR_INPUT);
+    if (sf)
+        current->dataNumbers[pos++] = sf->number;
+
+    sfmin = sensors_get_subfeature(name, feature,
+                       SENSORS_SUBFEATURE_CURR_MIN);
+    sfmax = sensors_get_subfeature(name, feature,
+                       SENSORS_SUBFEATURE_CURR_MAX);
+    if (sfmin && sfmax) {
+        current->format = fmtCurrents_2;
+        current->dataNumbers[pos++] = sfmin->number;
+        current->dataNumbers[pos++] = sfmax->number;
+    } else {
+        current->format = fmtCurrents_2;
+    }
+
+    /* terminate the list */
+    current->dataNumbers[pos] = -1;
+
+    /* alarm if applicable */
+    if ((sf = sensors_get_subfeature(name, feature,
+                     SENSORS_SUBFEATURE_CURR_ALARM)) ||
+        (sf = sensors_get_subfeature(name, feature,
+                     SENSORS_SUBFEATURE_CURR_MIN_ALARM)) ||
+        (sf = sensors_get_subfeature(name, feature,
+                     SENSORS_SUBFEATURE_CURR_MAX_ALARM))) {
+        current->alarmNumber = sf->number;
+    } else {
+        current->alarmNumber = -1;
+    }
+    /* beep if applicable */
+    if ((sf = sensors_get_subfeature(name, feature,
+                     SENSORS_SUBFEATURE_CURR_BEEP))) {
+        current->beepNumber = sf->number;
+    } else {
+        current->beepNumber = -1;
     }
 }
 
@@ -328,6 +384,9 @@ static FeatureDescriptor * generateChipFeatures(const sensors_chip_name *chip)
         case SENSORS_FEATURE_IN:
             fillChipVoltage(&features[count], chip, sensor);
             break;
+        case SENSORS_FEATURE_CURR:
+        	fillChipCurrent(&features[count], chip, sensor);
+        	break;
         case SENSORS_FEATURE_FAN:
             fillChipFan(&features[count], chip, sensor);
             break;
