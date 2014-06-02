@@ -126,7 +126,7 @@ static int do_features(const sensors_chip_name *chip,
     		log_addsensor(label, val[1], val[2]);
     	}
     } else {
-    	/* alarm condition occured */
+    	/* alarm condition occurred */
     	log_update_sensor(label, KATCP_LEVEL_WARN, val[0]);
         log_message(KATCP_LEVEL_WARN, "Sensor alarm: Chip %s: %s: %s",
               chipName(chip), label, formatted);
