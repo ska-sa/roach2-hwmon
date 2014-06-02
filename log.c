@@ -5,12 +5,37 @@
  *      Author: rijandn
  */
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include "log.h"
 
+struct descLookup {
+	char *chip;
+	char *name;
+	char *desc;
+};
+
 static struct katcl_line *k = NULL;
 static char *app = "roach2hwmon";
+
+static char *getDescription(const char *chip, char *name)
+{
+	int i = 0;
+	struct descLookup table[] = {
+			{"chip1", "name1", "desc1"},
+			{"chip2", "name2", "desc2"}
+	};
+	int numRows = 2; /// \todo determine at runtime?
+
+	for (i = 0; i < numRows; i++) {
+		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
+			return table[i].desc;
+		}
+	}
+
+	return "description";
+}
 
 int log_init(void)
 {
@@ -70,7 +95,7 @@ int log_sensorlist(void)
 	return ret;
 }
 
-int log_addsensor(char *name, double min, double max)
+int log_addsensor(const char *chip, char *name, double min, double max)
 {
 	int ret = 0;
 
@@ -81,12 +106,9 @@ int log_addsensor(char *name, double min, double max)
 	/* register sensor(s) */
 	ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-list");
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, name);
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, "description");
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, getDescription(chip, name));
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "millidegrees");
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "integer");
-
-	//ret += append_string_katcl(k, KATCP_FLAG_STRING, "0");
-	//ret += append_string_katcl(k, KATCP_FLAG_LAST | KATCP_FLAG_STRING, "80000");
 
 	/* multiply with a 1000 since our units are in milli's */
 	ret += append_signed_long_katcl(k, KATCP_FLAG_SLONG, (long)(min*1000));
@@ -120,7 +142,7 @@ int log_sensorstatus(void)
 	return ret;
 }
 
-int log_update_sensor(char *name, int status, double val)
+int log_update_sensor(const char *chip, char *name, int status, double val)
 {
 	int ret = 0;
 
