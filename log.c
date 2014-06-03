@@ -11,11 +11,11 @@
 #include "log.h"
 
 struct chipLookup {
-	char *chip;
-	char *name;
-	char *sensor;
-	char *desc;
-	char *unit;
+	const char *chip;
+	const char *name;
+	const char *sensor;
+	const char *desc;
+	const char *unit;
 };
 
 static const struct chipLookup table[] = {
@@ -53,6 +53,7 @@ static const struct chipLookup table[] = {
 static struct katcl_line *k = NULL;
 static char *app = "roach2hwmon";
 
+/*
 static int getAttributes(const char *chip, char *name, char *sensor,
 							char *description, char *unit)
 {
@@ -75,43 +76,50 @@ static int getAttributes(const char *chip, char *name, char *sensor,
 
 	return 1;
 }
+*/
 
-static char *getSensor(const char *chip, char *name)
+static const char *getSensor(const char *chip, char *name)
 {
 	int i = 0;
 
 	while (table[i].chip != NULL) {
 		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
 			return table[i].sensor;
-		}
+		} else {
+            log_message(KATCP_LEVEL_TRACE, "sensor not mapped.\n");
+        }
 		i++;
 	}
 
 	return "sensor";
 }
 
-static char *getDescription(const char *chip, char *name)
+static const char *getDescription(const char *chip, char *name)
 {
 	int i = 0;
 
 	while (table[i].chip != NULL) {
 		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
 			return table[i].desc;
-		}
+		} else {
+            log_message(KATCP_LEVEL_TRACE, "description not mapped.\n");
+        }
 		i++;
 	}
 
 	return "no description";
 }
 
-static char *getUnit(const char *chip, char *name)
+static const char *getUnit(const char *chip, char *name)
 {
 	int i = 0;
 
 	while (table[i].chip != NULL) {
 		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
 			return table[i].unit;
-		}
+		} else {
+            log_message(KATCP_LEVEL_TRACE, "unit not mapped.\n");
+        }
 		i++;
 	}
 
@@ -192,9 +200,9 @@ int log_addsensor(const char *chip, char *name, double min, double max)
 
 	/* register sensor(s) */
 	ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-list");
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, getSensor(chip, name));
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, getDescription(chip, name));
-	ret += append_string_katcl(k, KATCP_FLAG_STRING, getUnit(chip, name));
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)getSensor(chip, name));
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)getDescription(chip, name));
+	ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)getUnit(chip, name));
 	ret += append_string_katcl(k, KATCP_FLAG_STRING, "integer");
 
 	/* multiply with a 1000 since our units are in milli's */
