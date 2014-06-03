@@ -21,6 +21,7 @@ struct chipLookup {
 static const struct chipLookup table[] = {
 		{"chip1", "name1", "sensor1", "desc1", "unit1"},
 		{"chip2", "name2", "sensor2", "desc2", "unit2"},
+		{"acpitz-virtual-0", "temp1", "hp.temp", "hp temp sensor", "milidegrees"},
 		{"ad7414-i2c-0-4c", "temp1", "temp.inlet", "inlet temp", "millidegrees"},
 		{"ad7414-i2c-0-4e", "temp1", "temp.outlet", "outlet temp", "millidegrees"},
 		{"max1668-i2c-0-18", "temp1", "temp.ambient", "ambient temp", "millidegrees"},
@@ -83,11 +84,11 @@ static const char *getSensor(const char *chip, char *name)
 	int i = 0;
 
 	while (table[i].chip != NULL) {
-		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
-			return table[i].sensor;
-		} else {
-            log_message(KATCP_LEVEL_TRACE, "sensor not mapped.\n");
-        }
+		if (strcmp(chip, table[i].chip) == 0) {
+			if (strcmp(name, table[i].name) == 0) {
+				return table[i].sensor;
+			}
+		}
 		i++;
 	}
 
@@ -99,11 +100,11 @@ static const char *getDescription(const char *chip, char *name)
 	int i = 0;
 
 	while (table[i].chip != NULL) {
-		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
-			return table[i].desc;
-		} else {
-            log_message(KATCP_LEVEL_TRACE, "description not mapped.\n");
-        }
+		if (strcmp(chip, table[i].chip) == 0) {
+			if (strcmp(name, table[i].name) == 0) {
+				return table[i].desc;
+			}
+		}
 		i++;
 	}
 
@@ -115,11 +116,11 @@ static const char *getUnit(const char *chip, char *name)
 	int i = 0;
 
 	while (table[i].chip != NULL) {
-		if (!(strcmp(chip, table[i].chip) && strcmp(name, table[i].name))) {
-			return table[i].unit;
-		} else {
-            log_message(KATCP_LEVEL_TRACE, "unit not mapped.\n");
-        }
+		if (strcmp(chip, table[i].chip) == 0) {
+			if (strcmp(name, table[i].name) == 0) {
+				return table[i].unit;
+			}
+		}
 		i++;
 	}
 

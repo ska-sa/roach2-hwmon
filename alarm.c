@@ -57,9 +57,11 @@ int alarm_handler(const char *chipName, const char *label)
     int retVal = 0;
 
 	/* fpga temp alarm triggered */
-    if (!(strcmp(chipName, "max1668-i2c-0-18") && strcmp(label, "temp3"))) {
-        log_message(KATCP_LEVEL_WARN, "fpga alarm triggered...unloading fpga");
-        retVal = send_katcp_command("?progdev");
+    if (strcmp(chipName, "max1668-i2c-0-18") == 0) {
+    	if (strcmp(label, "temp3") == 0) {
+    		log_message(KATCP_LEVEL_WARN, "fpga alarm triggered...unloading fpga");
+    		retVal = send_katcp_command("?progdev");
+    	}
     }
 
     return retVal;
