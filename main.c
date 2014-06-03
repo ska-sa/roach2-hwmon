@@ -74,8 +74,6 @@ int main(int argc, char *argv[])
     /* main process loop ... */
     while (doScan) {
         printf("start scan...");
-        printf("done.\n");
-        fflush(stdout);
 
         if (R2HWMOND_READ_INTERVAL_S && (readValue <= 0)) {
             sense_readChips();
@@ -87,13 +85,16 @@ int main(int argc, char *argv[])
             scanValue += R2HWMOND_SCAN_INTERVAL_S;
         }
 
-        log_message(KATCP_LEVEL_INFO, "Scan done %d.\n", counter);
+        log_message(KATCP_LEVEL_TRACE, "scan done %d.\n", counter);
         counter++;
 
         /* calculate the sleeptime, since we have a read and scan interval */
         int a = R2HWMOND_SCAN_INTERVAL_S ? scanValue : INT_MAX;
         int b = R2HWMOND_READ_INTERVAL_S ? readValue : INT_MAX;
         sleepTime = (a < b) ? a : b;
+
+        printf("done.\n");
+        fflush(stdout);
 
         sleep(sleepTime);
 

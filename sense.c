@@ -27,7 +27,8 @@ static const char *chipName(const sensors_chip_name *chip)
 
 static int idChip(const sensors_chip_name *chip)
 {
-    const char *name, *adapter;
+    const char *name;
+    /* const char *adapter; */
 
     name = chipName(chip);
     if (!name) {
@@ -35,13 +36,15 @@ static int idChip(const sensors_chip_name *chip)
         return -1;
     }
 
-    log_message(KATCP_LEVEL_INFO, "Chip: %s", name);
+    log_message(KATCP_LEVEL_TRACE, "Chip: %s", name);
 
+    /*
     adapter = sensors_get_adapter_name(&chip->bus);
     if (!adapter)
         log_message(KATCP_LEVEL_ERROR, "Error getting adapter name");
     else
         log_message(KATCP_LEVEL_INFO, "Adapter: %s", adapter);
+    */
 
     return 0;
 }
@@ -115,11 +118,7 @@ static int do_features(const sensors_chip_name *chip,
     if (action == DO_READ) {
     	if (!firstRead) {
     		/* update katcp sensor-status */
-    		if (!log_update_sensor(chipName(chip), label, KATCP_LEVEL_INFO, val[0])) {
-    			log_message(KATCP_LEVEL_ERROR, "Error updating sensor status: %s",
-    		              label);
-    		}
-    		//log_message(KATCP_LEVEL_INFO, "  %s: %s", label, formatted);
+    		log_update_sensor(chipName(chip), label, KATCP_LEVEL_INFO, val[0]);
     	} else {
     		/* update katcp sensor-list */
     		log_addsensor(chipName(chip), label, val[1], val[2]);
