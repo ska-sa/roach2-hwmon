@@ -28,7 +28,7 @@
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.292568727" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1769671038" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1124925630" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1124925630" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="KATCP_USE_FLOATS"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1771149589" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>

@@ -57,7 +57,7 @@ static char *app = "roach2hwmon";
 
 /*
 static int getAttributes(const char *chip, char *name, const char *sensor,
-							conct char *description, const char *unit)
+							const char *description, const char *unit)
 {
 	int i = 0;
 
@@ -180,7 +180,7 @@ int log_addsensor(const char *chip, char *name, double min, double max)
 
 	/* register sensor(s) */
     if (sensorName && sensorDesc && sensorUnit) {
-	    ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-list");
+	    ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, KATCP_SENSOR_LIST_INFORM);
 	    ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)sensorName);
 	    ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)sensorDesc);
 	    ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)sensorUnit);
@@ -211,18 +211,26 @@ int log_update_sensor(const char *chip, char *name, int status, double val)
         gettimeofday(&now, NULL);
 
 	    /* update sensor status */
-	    ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, "#sensor-status");
+	    ret += append_string_katcl(k, KATCP_FLAG_FIRST | KATCP_FLAG_STRING, KATCP_SENSOR_STATUS_INFORM);
+
         ret += append_unsigned_long_katcl(k, KATCP_FLAG_ULONG, (unsigned long)now.tv_sec);
+/*
+#if KATCP_PROTOCOL_MAJOR_VERSION >= 5
+        ret += append_args_katcl(k, 0, "%lu.%03d", now.tv_sec, milli);
+#else
+        ret += append_args_katcl(k, 0, "%lu%03d", now.tv_sec, milli);
+#endif
+*/
 	    ret += append_string_katcl(k, KATCP_FLAG_STRING, "1");
 	    ret += append_string_katcl(k, KATCP_FLAG_STRING, (char*)sensorName);
 
-	    if (status == KATCP_LEVEL_INFO) {
+	    if (status == KATCP_STATUS_NOMINAL) {
 		    ret += append_string_katcl(k, KATCP_FLAG_STRING, "nominal");
-	    } else if (status == KATCP_LEVEL_WARN){
+	    } else if (status == KATCP_STATUS_WARN) {
 		    ret += append_string_katcl(k, KATCP_FLAG_STRING, "warn");
-	    } else if (status == KATCP_LEVEL_ERROR){
+	    } else if (status == KATCP_STATUS_ERROR) {
 		    ret += append_string_katcl(k, KATCP_FLAG_STRING, "error");
-	    } else if (status == KATCP_LEVEL_FATAL){
+	    } else if (status == KATCP_STATUS_FAILURE) {
 		    ret += append_string_katcl(k, KATCP_FLAG_STRING, "failure");
 	    } else {
 		    ret += append_string_katcl(k, KATCP_FLAG_STRING, "unknown");

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-int sensorlib_load(void);
+int sensorlib_load(const char* cfgFilename);
 
 void sensorlib_unload(void);
 

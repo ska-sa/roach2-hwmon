@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <limits.h>
+#include <getopt.h>
 #include "r2hwmond.h"
 #include "fork-parent.h"
 #include "sensorlib.h"
@@ -13,6 +14,13 @@
 #include "sense.h"
 
 static volatile sig_atomic_t doScan = 1;
+
+struct r2hwmond_configuration r2hwmond_cfg = {
+		.daemon 	= 0,
+		.cfgFile 	= 0,
+		.scanTime 	= R2HWMOND_SCAN_INTERVAL_S,
+		.updateTime = R2HWMOND_UPDATE_INTERVAL_S,
+};
 
 void signalHandler(int signalNumber)
 {
@@ -32,9 +40,11 @@ static int daemonize(void);
 
 int main(int argc, char *argv[])
 {
-    struct sigaction sa;
+    int opt = 0;
+	struct sigaction sa;
     unsigned int counter = 0;
     int scanValue = 0, readValue = 0, sleepTime = 0;
+    int ret = 0;
 
     printf("The name of this program is '%s'.\n", argv[0]);
     printf("The process ID is %d.\n", (int)getpid());
@@ -45,27 +55,54 @@ int main(int argc, char *argv[])
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGINT, &sa, NULL);
 
-    chips_parse();
+    /* process arguments */
+    while ((opt = getopt(argc, argv, "dc:s:u:")) != -1) {
+    	switch (opt) {
+    	case 'd':
+    		r2hwmond_cfg.daemon = 1;
+    		break;
+    	case 'c':
+    		r2hwmond_cfg.cfgFile = 1;
+    		r2hwmond_cfg.sensorCfgFile = optarg;
+    		break;
+    	case 's':
+    		r2hwmond_cfg.scanTime = atoi(optarg);
+    		break;
+    	case 'u':
+    		r2hwmond_cfg.updateTime = atoi(optarg);
+    		break;
+    	default:
+    		fprintf(stderr, "Usage: %s [-d] daemon [-c sensorConfigFile] [-s scanTime] [-u updateTime]\n", argv[0]);
+    		exit(EXIT_FAILURE);
+    	}
+    }
 
     /* run process by default in the foreground */
-    /* \todo add -d daemon option */
-    if (argc != 1) {
+    if (r2hwmond_cfg.daemon) {
         if (daemonize() < 0) {
             printf("Could not daemonize...\n");
             return EXIT_FAILURE;
         }
     }
 
+    /* load sensor lib with configuration file if it was specified */
+    if (r2hwmond_cfg.cfgFile) {
+    	ret = sensorlib_load(r2hwmond_cfg.sensorCfgFile);
+    } else {
+    	ret = sensorlib_load(NULL);
+    }
+    if (ret < 0) {
+    	fprintf(stderr, "Could not initialize sensor library.\n");
+    	exit(EXIT_FAILURE);
+    }
+
+    /* initialize katcp logs */
     if (log_init() < 0) {
         fprintf(stderr, "Could not initialize katcl message logic.\n");
+        exit(EXIT_FAILURE);
     }
 
-
-    if (sensorlib_load() < 0) {
-        fprintf(stderr, "Could not initialize sensor library.\n");
-        return EXIT_FAILURE;
-    }
-
+    chips_parse();
     initKnownChips();
 
     /* katcp sensor list get initialised on first sense_readChips() */
@@ -75,22 +112,22 @@ int main(int argc, char *argv[])
     while (doScan) {
         printf("start scan...");
 
-        if (R2HWMOND_READ_INTERVAL_S && (readValue <= 0)) {
+        if (r2hwmond_cfg.updateTime && (readValue <= 0)) {
             sense_readChips();
-            readValue += R2HWMOND_READ_INTERVAL_S;
+            readValue += r2hwmond_cfg.updateTime;
         }
 
-        if (R2HWMOND_SCAN_INTERVAL_S && (scanValue <= 0)) {
+        if (r2hwmond_cfg.scanTime && (scanValue <= 0)) {
             sense_scanChips();
-            scanValue += R2HWMOND_SCAN_INTERVAL_S;
+            scanValue += r2hwmond_cfg.scanTime;
         }
 
         log_message(KATCP_LEVEL_TRACE, "scan done %d.\n", counter);
         counter++;
 
         /* calculate the sleeptime, since we have a read and scan interval */
-        int a = R2HWMOND_SCAN_INTERVAL_S ? scanValue : INT_MAX;
-        int b = R2HWMOND_READ_INTERVAL_S ? readValue : INT_MAX;
+        int a = r2hwmond_cfg.scanTime ? scanValue : INT_MAX;
+        int b = r2hwmond_cfg.updateTime ? readValue : INT_MAX;
         sleepTime = (a < b) ? a : b;
 
         printf("done.\n");

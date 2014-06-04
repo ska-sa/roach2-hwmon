@@ -118,14 +118,14 @@ static int do_features(const sensors_chip_name *chip,
     if (action == DO_READ) {
     	if (!firstRead) {
     		/* update katcp sensor-status */
-    		log_update_sensor(chipName(chip), label, KATCP_LEVEL_INFO, val[0]);
+    		log_update_sensor(chipName(chip), label, KATCP_STATUS_NOMINAL, val[0]);
     	} else {
     		/* update katcp sensor-list */
     		log_addsensor(chipName(chip), label, val[1], val[2]);
     	}
     } else {
     	/* alarm condition occurred */
-    	log_update_sensor(chipName(chip), label, KATCP_LEVEL_WARN, val[0]);
+    	log_update_sensor(chipName(chip), label, KATCP_STATUS_WARN, val[0]);
         log_message(KATCP_LEVEL_WARN, "Sensor alarm: Chip %s: %s: %s",
               chipName(chip), label, formatted);
         alarm_handler(chipName(chip), label);
