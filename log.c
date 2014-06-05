@@ -47,10 +47,10 @@ static const struct chipLookup table[] = {
 		{"max16071-i2c-0-51", "in4", "current.1v0", "3v3 rail current", "milliamps", 1, 1},
 		{"max16071-i2c-0-51", "in6", "voltage.5vaux", "5v aux voltage rail", "millivolts", 1, 1},
 		{"max16071-i2c-0-51", "curr1", "current.5v", "5v rail current", "milliamps", 1, 1},
-		{"max6650-i2c-0-48", "fan1", "fan.fpga", "fpga fan", "rpm", 1, 1},
-		{"max6650-i2c-0-4b", "fan1", "fan.chs0", "chassis 0 fan", "rpm", 1, 1},
-		{"max6650-i2c-0-1b", "fan1", "fan.chs1", "chassis 1 fan", "rpm", 1, 1},
-		{"max6650-i2c-0-1f", "fan1", "fan.chs2", "chassis 2 fan", "rpm", 1, 1},
+		{"max6650-i2c-0-48", "fan1", "fan.fpga", "fpga fan", "rpm", 1000, 1},
+		{"max6650-i2c-0-4b", "fan1", "fan.chs0", "chassis 0 fan", "rpm", 1000, 1},
+		{"max6650-i2c-0-1b", "fan1", "fan.chs1", "chassis 1 fan", "rpm", 1000, 1},
+		{"max6650-i2c-0-1f", "fan1", "fan.chs2", "chassis 2 fan", "rpm", 1000, 1},
 		{NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -256,7 +256,7 @@ int log_update_sensor(const char *chip, char *name, int status, double val)
 	    }
 
 	    /* multiply with a 1000 since our units are in milli's */
-	    value = (long)((val * 1000) * getMult(sensorIndex) / getDiv(sensorIndex));
+	    value = (long)((val * 1000) / getMult(sensorIndex) * getDiv(sensorIndex));
 	    ret += append_signed_long_katcl(k, KATCP_FLAG_LAST | KATCP_FLAG_SLONG, value);
 
         /* write the log data out */
