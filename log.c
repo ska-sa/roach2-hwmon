@@ -12,7 +12,7 @@
 #include "log.h"
 
 #define SENS_R_1V0   (0.00025)
-#define GAIN_R_1V0  (470)
+#define GAIN_R_1V0   (470)
 
 #define SENS_R_1V5   (0.001)
 #define GAIN_R_1V5   (1200)
@@ -26,7 +26,10 @@
 #define SENS_R_3V3   (0.002)
 #define GAIN_R_3V3   (1200)
 
-#define GAIN(res) (1 + (100000/res))
+#define GAIN(res)    (1 + (100000/res))
+
+#define SENS_R_5V    (0.002)
+#define SENS_R_12V   (0.005)
 
 struct chipLookup {
 	const char *chip;
@@ -56,14 +59,14 @@ static const struct chipLookup table[] = {
 		{"max16071-i2c-0-50", "in5", "voltage.5v", "5v voltage rail", "millivolts", 1, 1},
 		{"max16071-i2c-0-50", "in6", "voltage.12v", "12v voltage rail", "millivolts", 10, 29.6},
 		{"max16071-i2c-0-50", "in7", "voltage.3v3aux", "3v3 aux voltage rail", "millivolts", 1, 1},
-		{"max16071-i2c-0-50", "curr1", "current.12v", "12v rail current", "milliamps", 1, 1},
+		{"max16071-i2c-0-50", "curr1", "current.12v", "12v rail current", "milliamps", (1000 * SENS_R_12V), 1},
 		{"max16071-i2c-0-51", "in0", "current.3v3", "3v3 rail current", "milliamps", (GAIN(GAIN_R_3V3) * SENS_R_3V3), 1},
 		{"max16071-i2c-0-51", "in1", "current.2v5", "2v5 rail current", "milliamps", (GAIN(GAIN_R_2V5) * SENS_R_2V5), 1},
 		{"max16071-i2c-0-51", "in2", "current.1v8", "1v8 rail current", "milliamps", (GAIN(GAIN_R_1V8) * SENS_R_1V8), 1},
 		{"max16071-i2c-0-51", "in3", "current.1v5", "1v5 rail current", "milliamps", (GAIN(GAIN_R_1V5) * SENS_R_1V5), 1},
 		{"max16071-i2c-0-51", "in4", "current.1v0", "1v0 rail current", "milliamps", (GAIN(GAIN_R_1V0) * SENS_R_1V0), 1},
 		{"max16071-i2c-0-51", "in6", "voltage.5vaux", "5v aux voltage rail", "millivolts", 1, 1},
-		{"max16071-i2c-0-51", "curr1", "current.5v", "5v rail current", "milliamps", 1, 1},
+		{"max16071-i2c-0-51", "curr1", "current.5v", "5v rail current", "milliamps", (1000 * SENS_R_5V), 1},
 		{"max6650-i2c-0-48", "fan1", "fan.fpga", "fpga fan", "rpm", 1000, 1},
 		{"max6650-i2c-0-4b", "fan1", "fan.chs0", "chassis 0 fan", "rpm", 1000, 1},
 		{"max6650-i2c-0-1b", "fan1", "fan.chs1", "chassis 1 fan", "rpm", 1000, 1},
