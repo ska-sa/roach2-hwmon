@@ -14,6 +14,7 @@
 #include "sense.h"
 
 static volatile sig_atomic_t doScan = 1;
+static volatile sig_atomic_t pipeBroken = 0;
 
 struct r2hwmond_configuration r2hwmond_cfg = {
 		.daemon 	= 0,
@@ -29,6 +30,11 @@ void signalHandler(int signalNumber)
         case SIGINT:
             doScan = 0;
             break;
+
+        case SIGPIPE:
+        	/* tcpborphserver most probably stopped ... */
+        	pipeBroken = 1;
+        	break;
 
         default:
             return; 
@@ -54,6 +60,7 @@ int main(int argc, char *argv[])
     sa.sa_handler = &signalHandler;
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGPIPE, &sa, NULL);
 
     /* process arguments */
     while ((opt = getopt(argc, argv, "dc:s:u:")) != -1) {
@@ -112,11 +119,13 @@ int main(int argc, char *argv[])
     while (doScan) {
         printf("start scan...");
 
+        /* read/update sensor values */
         if (r2hwmond_cfg.updateTime && (readValue <= 0)) {
             sense_readChips();
             readValue += r2hwmond_cfg.updateTime;
         }
 
+        /* scan sensors for alarms */
         if (r2hwmond_cfg.scanTime && (scanValue <= 0)) {
             sense_scanChips();
             scanValue += r2hwmond_cfg.scanTime;
