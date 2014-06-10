@@ -243,7 +243,7 @@ int log_update_sensor(const char *chip, char *name, int status, double val)
 	long value = 0;
     int ret = 0;
 
-	if (k == NULL && !logEnabled) {
+	if (k == NULL || !logEnabled) {
 		return -1;
 	}
 

@@ -92,6 +92,12 @@ int main(int argc, char *argv[])
             printf("Could not daemonize...\n");
             return EXIT_FAILURE;
         }
+    } else {
+        /* initialize katcp logs */
+        if (log_init() < 0) {
+            fprintf(stderr, "Could not initialize katcl message logic.\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     /* load sensor lib with configuration file if it was specified */
@@ -103,12 +109,6 @@ int main(int argc, char *argv[])
     if (ret < 0) {
     	fprintf(stderr, "Could not initialize sensor library.\n");
     	exit(EXIT_FAILURE);
-    }
-
-    /* initialize katcp logs */
-    if (log_init() < 0) {
-        fprintf(stderr, "Could not initialize katcl message logic.\n");
-        exit(EXIT_FAILURE);
     }
 
     chips_parse();
