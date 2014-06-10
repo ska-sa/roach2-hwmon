@@ -23,7 +23,11 @@ struct r2hwmond_configuration r2hwmond_cfg = {
 		.updateTime = R2HWMOND_UPDATE_INTERVAL_S,
 };
 
-void signalHandler(int signalNumber)
+/* c-function prototypes */
+static int daemonize(void);
+static void signalHandler(int signalNumber);
+
+static void signalHandler(int signalNumber)
 {
     switch (signalNumber) {
         case SIGTERM:
@@ -34,15 +38,13 @@ void signalHandler(int signalNumber)
         case SIGPIPE:
         	/* tcpborphserver most probably stopped ... */
         	pipeBroken = 1;
+        	log_disable();
         	break;
 
         default:
             return; 
     }
 }
-
-/* c-function prototypes */
-static int daemonize(void);
 
 int main(int argc, char *argv[])
 {
@@ -117,7 +119,10 @@ int main(int argc, char *argv[])
 
     /* main process loop ... */
     while (doScan) {
+
+#if 0
         printf("start scan...");
+#endif
 
         /* read/update sensor values */
         if (r2hwmond_cfg.updateTime && (readValue <= 0)) {
@@ -134,23 +139,25 @@ int main(int argc, char *argv[])
         log_message(KATCP_LEVEL_TRACE, "scan done %d.\n", counter);
         counter++;
 
+#if 0
+        printf("done.\n");
+        fflush(stdout);
+#endif
+
         /* calculate the sleeptime, since we have a read and scan interval */
         int a = r2hwmond_cfg.scanTime ? scanValue : INT_MAX;
         int b = r2hwmond_cfg.updateTime ? readValue : INT_MAX;
         sleepTime = (a < b) ? a : b;
 
-        printf("done.\n");
-        fflush(stdout);
-
         sleep(sleepTime);
-
         scanValue -= sleepTime;
         readValue -= sleepTime;
-
     }
 
     /* clean-up */
+#if 0
     printf("Performing clean-up...\n");
+#endif
     log_message(KATCP_LEVEL_INFO, "Shutting down...\n");
     freeKnownChips();
     sensorlib_unload();
@@ -160,7 +167,7 @@ int main(int argc, char *argv[])
 }
 
 /* daemonize the process by detaching itself from the parent */
-int daemonize(void)
+static int daemonize(void)
 {
     if (fork_parent() < 0) {
         fprintf(stderr, "Unable to launch child process.\n");

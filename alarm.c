@@ -7,11 +7,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/reboot.h>
+#include <unistd.h>
 #include "alarm.h"
 #include "r2hwmond.h"
 #include "log.h"
 #include "katcl.h"
 #include "katcp.h"
+
+#define RPC_TIMEOUT_MS	(5000)
 
 static int send_katcp_command(const char *command)
 {
@@ -25,8 +29,8 @@ static int send_katcp_command(const char *command)
         return 1;
     }
 
-    /* send the request, with 5000ms timeout. Here we don't pass any parameters */
-    retVal = send_rpc_katcl(l, 5000, KATCP_FLAG_FIRST | KATCP_FLAG_LAST | KATCP_FLAG_STRING, command, NULL);
+    /* send the request, with RPC_TIMEOUT_MS timeout. Here we don't pass any parameters */
+    retVal = send_rpc_katcl(l, RPC_TIMEOUT_MS, KATCP_FLAG_FIRST | KATCP_FLAG_LAST | KATCP_FLAG_STRING, command, NULL);
 
     /* result is 0 if the reply returns "ok", 1 if it failed and -1 if things went wrong doing IO or otherwise */
 #if 0
@@ -56,13 +60,28 @@ int alarm_handler(const char *chipName, const char *label)
 {
     int retVal = 0;
 
-	/* fpga temp alarm triggered */
-    if (strcmp(chipName, "max1668-i2c-0-18") == 0) {
+	if (strcmp(chipName, "max1668-i2c-0-18") == 0) {
     	if (strcmp(label, "temp3") == 0) {
+    		/* fpga temp alarm triggered */
     		log_message(KATCP_LEVEL_WARN, "fpga alarm triggered...unloading fpga");
     		retVal = send_katcp_command("?progdev");
+    	} else if (strcmp(label, "temp2") == 0) {
+    		/* powerpc temp alarm triggered */
+    		log_message(KATCP_LEVEL_WARN, "powerpc alarm triggered...shutting down");
+    		sync();
+    		retVal = reboot(RB_POWER_OFF);
+    		if (retVal < 0) {
+    			log_message(KATCP_LEVEL_WARN, "could not shut the system down.");
+    		}
     	}
     }
+
+#if 0
+	if (retVal) {
+    	sync();
+    	reboot(RB_POWER_OFF);
+    }
+#endif
 
     return retVal;
 }

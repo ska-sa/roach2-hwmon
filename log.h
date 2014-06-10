@@ -27,6 +27,8 @@ int log_sensorstatus(void);
 
 int log_update_sensor(const char *chip, char *name, int status, double val);
 
+inline void log_disable(void);
+
 void log_cleanup(void);
 
 #ifdef __cplusplus

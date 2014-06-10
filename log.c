@@ -76,6 +76,7 @@ static const struct chipLookup table[] = {
 
 static struct katcl_line *k = NULL;
 static char *app = "roach2hwmon";
+static volatile int logEnabled = 0;
 
 /*
 static int getAttributes(const char *chip, char *name, const char *sensor,
@@ -172,6 +173,8 @@ int log_init(void)
         return -1;
     }
 
+    logEnabled = 1;
+
     return 0;
 }
 
@@ -180,7 +183,7 @@ int log_message(int loglevel, char *fmt, ...)
     va_list args;
     int ret = -1;
 
-    if (k == NULL) {
+    if (k == NULL || !logEnabled) {
         return -1;
     }
 
@@ -204,7 +207,7 @@ int log_addsensor(const char *chip, char *name, double min, double max)
 	int sensorIndex = -1;
 	int ret = 0;
 
-	if (k == NULL) {
+	if (k == NULL || !logEnabled) {
 		return -1;
 	}
 
@@ -240,7 +243,7 @@ int log_update_sensor(const char *chip, char *name, int status, double val)
 	long value = 0;
     int ret = 0;
 
-	if (k == NULL) {
+	if (k == NULL && !logEnabled) {
 		return -1;
 	}
 
@@ -284,6 +287,11 @@ int log_update_sensor(const char *chip, char *name, int status, double val)
     }
 
 	return ret;
+}
+
+inline void log_disable(void)
+{
+	logEnabled = 0;
 }
 
 void log_cleanup(void)
