@@ -12,20 +12,24 @@
 #include "sensord.h"
 #include "log.h"
 #include "sense.h"
+#include "r2hwmon_ver.h"
+#include "version.h"
 
 static volatile sig_atomic_t doScan = 1;
 static volatile sig_atomic_t pipeBroken = 0;
 
 struct r2hwmond_configuration r2hwmond_cfg = {
-		.daemon 	= 0,
-		.cfgFile 	= 0,
-		.scanTime 	= R2HWMOND_SCAN_INTERVAL_S,
-		.updateTime = R2HWMOND_UPDATE_INTERVAL_S,
+		.daemon 	 = 0,
+		.cfgFile 	 = 0,
+		.scanTime 	 = R2HWMOND_SCAN_INTERVAL_S,
+		.updateTime  = R2HWMOND_UPDATE_INTERVAL_S,
 };
 
 /* c-function prototypes */
 static int daemonize(void);
 static void signalHandler(int signalNumber);
+static void print_version(void);
+static void print_usage(void);
 
 static void signalHandler(int signalNumber)
 {
@@ -36,7 +40,7 @@ static void signalHandler(int signalNumber)
             break;
 
         case SIGPIPE:
-        	/* tcpborphserver most probably stopped ... */
+        	/* tcpborphserver most probably stopped ... disable logging */
         	pipeBroken = 1;
         	log_disable();
         	break;
@@ -54,8 +58,10 @@ int main(int argc, char *argv[])
     int scanValue = 0, readValue = 0, sleepTime = 0;
     int ret = 0;
 
+#if 0
     printf("The name of this program is '%s'.\n", argv[0]);
     printf("The process ID is %d.\n", (int)getpid());
+#endif
 
     /* initialize the signal handler */
     memset(&sa, 0, sizeof(sa));
@@ -64,8 +70,8 @@ int main(int argc, char *argv[])
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGPIPE, &sa, NULL);
 
-    /* process arguments */
-    while ((opt = getopt(argc, argv, "dc:s:u:")) != -1) {
+    /* process command line arguments */
+    while ((opt = getopt(argc, argv, "dc:s:u:v")) != -1) {
     	switch (opt) {
     	case 'd':
     		r2hwmond_cfg.daemon = 1;
@@ -80,8 +86,15 @@ int main(int argc, char *argv[])
     	case 'u':
     		r2hwmond_cfg.updateTime = atoi(optarg);
     		break;
+    	case 'v':
+    		print_version();
+    		exit(EXIT_SUCCESS);
+    		break;
+    	case '?':
+    		print_usage();
+    		exit(EXIT_FAILURE);
     	default:
-    		fprintf(stderr, "Usage: %s [-d] daemon [-c sensorConfigFile] [-s scanTime] [-u updateTime]\n", argv[0]);
+    		print_usage();
     		exit(EXIT_FAILURE);
     	}
     }
@@ -111,10 +124,11 @@ int main(int argc, char *argv[])
     	exit(EXIT_FAILURE);
     }
 
+    /* prepare sensor library parameters */
     chips_parse();
     initKnownChips();
 
-    /* katcp sensor list get initialised on first sense_readChips() */
+    /* katcp sensor list get initialized on first sense_readChips() */
     sense_readChips();
 
     /* main process loop ... */
@@ -136,7 +150,7 @@ int main(int argc, char *argv[])
             scanValue += r2hwmond_cfg.scanTime;
         }
 
-        log_message(KATCP_LEVEL_TRACE, "scan done %d.\n", counter);
+        log_message(KATCP_LEVEL_TRACE, "scan %d done.\n", counter);
         counter++;
 
 #if 0
@@ -175,7 +189,6 @@ static int daemonize(void)
     }
 
     /* print initialization strings via parent stderr pipe */
-    fprintf(stderr, "Initializing daemon...\n");
     fprintf(stderr, "The daemon process id is %d.\n", (int)getpid());
 
     /* change daemon working directory to root */
@@ -189,4 +202,17 @@ static int daemonize(void)
     close(STDERR_FILENO);
 
     return 0;
+}
+
+static void print_version(void)
+{
+	printf("%s version %d.%d.%d with libsensors version %s\n", R2HWMOND_PROG,
+			R2HWMOND_VER_MAJOR, R2HWMOND_VER_MINOR, R2HWMOND_VER_BUGFIX, LM_VERSION);
+	printf("Build %s %s\n", __DATE__, __TIME__);
+}
+
+static void print_usage(void)
+{
+	fprintf(stderr, "Usage: %s [-d daemon] [-c sensorConfigFile] [-s scanTime]"
+			" [-u updateTime] [-v version]\n", R2HWMOND_PROG);
 }

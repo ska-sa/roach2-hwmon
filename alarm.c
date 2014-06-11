@@ -76,7 +76,8 @@ int alarm_handler(const char *chipName, const char *label)
     	}
     }
 
-#if 0
+#if 1
+	/* power the system off if an attempt to contact tcpborphserver was unsuccessful */
 	if (retVal) {
     	sync();
     	reboot(RB_POWER_OFF);

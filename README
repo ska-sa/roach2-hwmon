@@ -1,4 +1,5 @@
 Roach 2 hardware monitoring
+---------------------------
 
 The r2hwmond application monitors the roach sensors via the /sys/class/hwmon/
 interface using the lm-sensors library.
@@ -6,11 +7,13 @@ interface using the lm-sensors library.
 Katcp is used to provide katcp logs and command to take action once an alarm is
 triggered.
 
-Dependencies
+It distinguish between a scan interval and an update interval:
+    scan interval : check for alarms
+    update interval: update sensor status (including value) information
+
+Dependencies (and more information)
 1. lm-sensors 
     http://lm-sensors.org/
 2. katcp library
     https://casper.berkeley.edu/wiki/KATCP
     https://github.com/ska-sa/katcp_devel
-
-
