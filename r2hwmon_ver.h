@@ -9,7 +9,7 @@
 
 #define R2HWMOND_PROG		"r2hwmond"
 
-#define R2HWMOND_VER_MAJOR	(0)
+#define R2HWMOND_VER_MAJOR	(1)
 #define R2HWMOND_VER_MINOR	(0)
 #define R2HWMOND_VER_BUGFIX	(0)
 

@@ -23,31 +23,11 @@
 
 #include "lib/sensors.h"
 
-#define ARRAY_SIZE(arr)    (int)(sizeof(arr) / sizeof((arr)[0]))
-
-extern void sensorLog(int priority, const char *fmt, ...);
-
-/* from args.c */
-
-extern int parseArgs(int argc, char **argv);
-extern int parseChips(int argc, char **argv);
-extern void freeChips(void);
-
-/* from lib.c */
-
-extern int loadLib(const char *cfgPath);
-extern int reloadLib(const char *cfgPath);
-extern int unloadLib(void);
-
 /* from sense.c */
-
 extern int readChips(void);
 extern int scanChips(void);
-extern int setChips(void);
-extern int rrdChips(void);
 
 /* from chips.c */
-
 #define MAX_DATA 5
 
 typedef const char *(*FormatterFN) (const double values[], int alrm,
