@@ -28,7 +28,7 @@ clean:
 	$(RM) $(DBG_EXE)
 	
 static: 
-	$(CC) $(CFLAGS) -02 -o $(EXE) $(INC) $(SOURCE) -static $(LIB) -lm
+	$(CC) $(CFLAGS) -O2 -o $(EXE) $(INC) $(SOURCE) -static $(LIB) -lm
 
 install: $(EXE)
 	$(ECHO) "Attempting to copy $(EXE) to server..."
