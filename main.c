@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
     /* initialize the signal handler */
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = &signalHandler;
+    sa.sa_flags = SA_RESTART;
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGPIPE, &sa, NULL);

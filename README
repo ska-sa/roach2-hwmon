@@ -11,7 +11,7 @@ Under typical usage the r2hwmond application will be started from within
 tcpborphserver:
     ?job process r2hwmond exec://r2hwmond
 
-the application distinguish between a scan interval and an update interval:
+The application distinguish between a scan interval and an update interval:
     scan interval : check for alarms
     update interval: update sensor status (including value) information
     
