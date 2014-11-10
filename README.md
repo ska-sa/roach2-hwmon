@@ -4,7 +4,7 @@ Roach 2 hardware monitoring
 The r2hwmond application monitors the roach sensors via the /sys/class/hwmon/
 interface using the lm-sensors library.
 
-Katcp is used to provide katcp logs and command to take action once an alarm is
+Katcp is used to provide katcp logs/commands to take action once an alarm is
 triggered. Currently action is taken on the FPGA and PowerPC temperature alarms.
 
 Under typical usage the r2hwmond application will be started from within
