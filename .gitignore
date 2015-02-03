@@ -1,2 +1,7 @@
 r2hwmond
 r2hwmondd
+
+# ignore eclipse project files
+.cproject
+.project
+.settings/
